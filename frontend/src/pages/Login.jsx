@@ -16,31 +16,32 @@ const Login = () => {
     setFormValues((prevState) => ({ ...prevState, [name]: value }));
   };
 
+  // Handles the submission of the login form, validating input fields and managing error states
   const handleOnSubmit = (e) => {
     e.preventDefault();
-
+ 
     if (!validateEmail(formValues.email)) {
       setErrors((prevState) => ({
         ...prevState,
         email: "Please enter a valid email",
       }));
     }
-
+ 
     if (!formValues.password) {
       setErrors((prevState) => ({
         ...prevState,
-        password: "Please enter a password",
+        password: "Please enter the password",
       }));
     }
-
-    // If there are no errors, clear them and call the login API
+ 
+    // If there are no errors, clear them and call the signup API
     if (Object.keys(errors).length === 0) {
       setErrors({}); // clear errors on submit
     }
   };
 
   return (
-    <div>
+    <>
       <Navbar />
 
       <div className="flex justify-center items-center mt-28">
@@ -75,14 +76,14 @@ const Login = () => {
 
             <p className="text-sm text-center mt-4">
               Not registered yet?
-              <Link to="/signup" className="font-medium text-primary underline">
+              <Link to="/signup" className="ms-1 font-medium text-primary underline">
                 Create an Account
               </Link>
             </p>
           </form>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
