@@ -6,13 +6,13 @@ const generateToken = (user) => {
 }
 
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers("Authorization");
-    const token = authHeader && authHeader.split("")[1];
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
-    if (!token) return res.status(401).json({ message: "Token is not provided" });
+    if (!token) return res.sendStatus(401);
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: "Invalid token" });
+        if (err) return res.status(401).json({ message: "Invalid token" });
         req.user = user;
         next();
     });
