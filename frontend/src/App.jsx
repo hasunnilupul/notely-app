@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 
-import { AuthProvider } from "./context/AuthContext";
+import AuthContext, { AuthProvider } from "./context/AuthContext";
 import AppRouter from "./router";
 
 const App = () => {

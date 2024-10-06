@@ -13,9 +13,6 @@ export const AuthProvider = ({ children }) => {
     if (response.data && response.data.user) {
       setIsAuthenticated((prevState) => true);
       setAuthenticatedUser((prevState) => response.data.user);
-    } else {
-      setIsAuthenticated((prevState) => false);
-      setAuthenticatedUser((prevState) => null);
     }
   };
 
