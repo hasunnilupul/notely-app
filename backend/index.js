@@ -113,31 +113,113 @@ app.post("/api/auth/login", async (req, res) => {
 
 });
 
+// Endpoint to retrieve user notes
+// This route is protected by the authenticateToken middleware to ensure only authenticated users can view their notes
+app.get("/api/notes", authenticateToken, async (req, res) => {
+    const { user } = req.user;
+
+    try {
+        const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
+        return res.json({
+            error: false,
+            notes,
+            message: "Notes retrieved successfully."
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error." });
+    }
+});
+
+// Route handler for POST requests to processes the request to save the note in the database
+// This route is protected by the authenticateToken middleware to ensure only authenticated users can create notes
 app.post("/api/notes", authenticateToken, async (req, res) => {
     const { title, content, tags } = req.body;
     const { user } = req.user;
 
+    // Check if title is provided, respond with an error if missing.
     if (!title) {
         return res.status(400).json({ error: true, message: "Title is required." });
     }
 
+    // Check if content is provided, respond with an error if missing.
     if (!content) {
         return res.status(400).json({ error: true, message: "Content is required." });
     }
 
     try {
+        // Create a new note instance with the provided data.
         const note = new Note({
             title,
             content,
             tags: tags || [],
             userId: user._id
         });
+        // Save the note to the database.
+        await note.save();
+
+        // Respond with the created note and a success message.
+        return res.json({
+            error: false,
+            note,
+            message: "Note created successfully."
+        });
+    } catch (error) {
+        // Handle any errors that occur during the note creation process.
+        return res.status(500).json({ error: true, message: "Internal server error." });
+    }
+});
+
+// PATCH endpoint for updating a specific note by its ID
+// This route is protected by the authenticateToken middleware to ensure only authenticated users can update note details
+app.patch("/api/notes/:id", authenticateToken, async (req, res) => {
+    const noteId = req.params.id;
+    const { title, content, tags, isPinned } = req.body;
+    const { user } = req.user;
+
+    if (!title && !content && !tags) {
+        return res.status(400).json({ error: true, message: "At least one field is required to update the note." });
+    }
+
+    try {
+        const note = await Note.findById(noteId);
+        if (!note || note?.userId?.toString() !== user?._id?.toString()) {
+            return res.status(404).json({ error: true, message: "Note not found." });
+        }
+
+        if (title && note.title !== title) note.title = title;
+        if (content && note.content !== content) note.content = content;
+        if (tags) note.tags = tags;
+        if (isPinned && note.isPinned !== isPinned) note.isPinned = isPinned;
+
         await note.save();
 
         return res.json({
             error: false,
             note,
-            message: "Note created successfully."
+            message: "Note updated successfully."
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error." });
+    }
+});
+
+// Deletes a note specified by its ID from the database.
+// This route is protected by the authenticateToken middleware to ensure only authenticated users can delete notes
+app.delete("/api/notes/:id", authenticateToken, async (req, res) => {
+    const noteId = req.params.id;
+    const { user } = req.user;
+
+    try {
+        const note = await Note.findById(noteId);
+        if (!note || note?.userId?.toString() !== user?._id?.toString()) {
+            return res.status(404).json({ error: true, message: "Note not found." });
+        }
+
+        await Note.deleteOne({ _id: noteId, userId: user._id });
+
+        return res.json({
+            error: false,
+            message: "Note deleted successfully."
         });
     } catch (error) {
         return res.status(500).json({ error: true, message: "Internal server error." });
