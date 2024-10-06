@@ -96,7 +96,7 @@ app.post("/api/auth/login", async (req, res) => {
         return res.status(400).json({ message: "User not found." });
     }
 
-    if (existingUser.password = password) {
+    if (existingUser.password === password) {
         // Generating an access token for the user
         const accessToken = generateToken(existingUser);
         // Returning a successful response with user data and access token
