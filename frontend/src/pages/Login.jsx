@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar/Navbar";
 import PasswordInput from "../components/Input/PasswordInput";
 import { validateEmail } from "../utils/helper";
 import axiosInstance from "../utils/axiosInstance";
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { handleAuthentication } = useContext(AuthContext); // to get access to the auth context
   const [formValues, setFormValues] = useState({ email: "", password: "" }); // form values
   const [errors, setErrors] = useState({}); // form errors
 
@@ -49,7 +51,7 @@ const Login = () => {
 
       // If login is successful, set access token in local storage and navigate to home page
       if (response.data && response.data.accessToken) {
-        localStorage.setItem("ACCESS_TOKEN", response.data.accessToken);
+        await handleAuthentication(response.data.accessToken);
         navigate("/");
       }
     } catch (error) {

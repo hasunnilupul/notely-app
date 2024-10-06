@@ -1,20 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
+import AuthContext from "../../context/AuthContext";
 
 const Navbar = () => {
-  const navigate = useNavigate();
+  const { isAuthenticated } = useContext(AuthContext); // to get access to the auth context
   const [searchQuery, setSearchQuery] = useState(""); // search text state
 
-  const handleOnSearch = () => {
-
-  }
-
-  const handleOnLogout = () => {
-    navigate("/login", { replace: true });
-  };
+  const handleOnSearch = () => {};
 
   return (
     <div className="bg-white flex items-center justify-between px-6 py-2 drop-shadow">
@@ -28,7 +23,8 @@ const Navbar = () => {
         onSearch={handleOnSearch}
       />
 
-      <ProfileInfo onLogout={handleOnLogout} />
+      {/* Profile Info */}
+      {isAuthenticated && <ProfileInfo />}
     </div>
   );
 };
