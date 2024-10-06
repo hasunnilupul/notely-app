@@ -113,6 +113,23 @@ app.post("/api/auth/login", async (req, res) => {
 
 });
 
+// This endpoint retrieves the authenticated user's information
+// This route is protected by the authenticateToken middleware to ensure only authenticated users can access
+app.get("/api/auth/user", authenticateToken, async (req, res) => {
+    const { user } = req.user;
+
+    // Check if the user exists in the database
+    const existingUser = await User.findOne({ _id: user._id });
+    if (!existingUser) {
+        return res.sendStatus(401);
+    }
+
+    return res.json({
+        user: { _id: existingUser._id, fullName: existingUser.fullName, email: existingUser.email, createdAt: existingUser.createdAt },
+        message: ""
+    });
+});
+
 // Endpoint to retrieve user notes
 // This route is protected by the authenticateToken middleware to ensure only authenticated users can view their notes
 app.get("/api/notes", authenticateToken, async (req, res) => {
