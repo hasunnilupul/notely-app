@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import TagInput from "../Input/TagInput";
 import { MdClose } from "react-icons/md";
@@ -19,39 +19,51 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
   };
 
   // edit a note
-  const editNote = () => {}
+  const editNote = () => {};
 
   // add a new note
-  const addNewNote = () => {}
+  const addNewNote = () => {};
 
   const handleOnClick = () => {
     if (!formValues.title) {
-        setErrors((prevState) => ({
-          ...prevState,
-          email: "Please enter the title",
-        }));
-        return;
-      }
-  
-      if (!formValues.content) {
-        setErrors((prevState) => ({
-          ...prevState,
-          password: "Please enter the content",
-        }));
-        return;
-      }
-  
-      // If there are no errors, clear them
-      setErrors({});
-      
-      if(type === "edit"){
-        // If the type is edit, update the note with the new values
-        editNote();
-      } else {
-        // else create a new note with the form values
-        addNewNote();
-      }
-  }
+      setErrors((prevState) => ({
+        ...prevState,
+        email: "Please enter the title",
+      }));
+      return;
+    }
+
+    if (!formValues.content) {
+      setErrors((prevState) => ({
+        ...prevState,
+        password: "Please enter the content",
+      }));
+      return;
+    }
+
+    // If there are no errors, clear them
+    setErrors({});
+
+    if (type === "edit") {
+      // If the type is edit, update the note with the new values
+      editNote();
+    } else {
+      // else create a new note with the form values
+      addNewNote();
+    }
+  };
+
+  // init
+  useEffect(() => {
+    if (type === "edit" && data) {
+      setFormValues((prevState) => ({
+        ...prevState,
+        title: data.title,
+        content: data.content,
+      }));
+      setTags(prevState => data.tags);
+    }
+  }, []);
 
   return (
     <Modal
@@ -66,8 +78,12 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
       className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-auto"
     >
       <div className="relative">
-        <button type="button" className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-50" onClick={() => onClose()}>
-            <MdClose className="text-xl text-slate-400"/>
+        <button
+          type="button"
+          className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-50"
+          onClick={() => onClose()}
+        >
+          <MdClose className="text-xl text-slate-400" />
         </button>
 
         <div className="flex flex-col gap-2">
@@ -110,13 +126,14 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
           <label htmlFor="tags" className="input-label">
             Tags
           </label>
-          <TagInput
-            tags={tags}
-            setTags={setTags}
-          />
+          <TagInput tags={tags} setTags={setTags} />
         </div>
 
-        <button type="button" className="btn-primary font-medium mt-5 p-3" onClick={handleOnClick}>
+        <button
+          type="button"
+          className="btn-primary font-medium mt-5 p-3"
+          onClick={handleOnClick}
+        >
           Add
         </button>
       </div>
