@@ -226,6 +226,37 @@ app.delete("/api/notes/:id", authenticateToken, async (req, res) => {
     }
 });
 
+// Express route handler to pin a note specified by its ID
+// ensures the note belongs to the user, updates the pin status and returns the updated note.
+app.patch("/api/notes/:id/pin", authenticateToken, async (req, res) => {
+    const noteId = req.params.id;
+    const { isPinned } = req.body;
+    const { user } = req.user;
+
+    if (!isPinned) {
+        return res.status(400).json({ error: true, message: "No changes provided." });
+    }
+
+    try {
+        const note = await Note.findById(noteId);
+        if (!note || note?.userId?.toString() !== user?._id?.toString()) {
+            return res.status(404).json({ error: true, message: "Note not found." });
+        }
+
+        if (isPinned && note.isPinned !== isPinned) note.isPinned = isPinned;
+
+        await note.save();
+
+        return res.json({
+            error: false,
+            note,
+            message: "Note updated successfully."
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error." });
+    }
+});
+
 app.listen(8080);
 
 module.exports = app;
