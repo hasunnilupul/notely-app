@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import Navbar from "../components/Navbar/Navbar";
 import PasswordInput from "../components/Input/PasswordInput";
+import { validateEmail } from "../utils/helper";
 
 const SignUp = () => {
   const [formValues, setFormValues] = useState({
@@ -28,6 +29,7 @@ const SignUp = () => {
         ...prevState,
         name: "Please enter your name",
       }));
+      return;
     }
 
     if (!validateEmail(formValues.email)) {
@@ -35,6 +37,7 @@ const SignUp = () => {
         ...prevState,
         email: "Please enter a valid email",
       }));
+      return;
     }
 
     if (!formValues.password) {
@@ -42,12 +45,12 @@ const SignUp = () => {
         ...prevState,
         password: "Please enter a password",
       }));
+      return;
     }
 
-    // If there are no errors, clear them and call the login API
-    if (Object.keys(errors).length === 0) {
-      setErrors({}); // clear errors on submit
-    }
+    // If there are no errors, clear them
+    setErrors({});
+    // call the login API here
   };
   return (
     <>

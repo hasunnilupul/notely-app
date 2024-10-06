@@ -19,25 +19,26 @@ const Login = () => {
   // Handles the submission of the login form, validating input fields and managing error states
   const handleOnSubmit = (e) => {
     e.preventDefault();
- 
+
     if (!validateEmail(formValues.email)) {
       setErrors((prevState) => ({
         ...prevState,
         email: "Please enter a valid email",
       }));
+      return;
     }
- 
+
     if (!formValues.password) {
       setErrors((prevState) => ({
         ...prevState,
         password: "Please enter the password",
       }));
+      return;
     }
- 
-    // If there are no errors, clear them and call the signup API
-    if (Object.keys(errors).length === 0) {
-      setErrors({}); // clear errors on submit
-    }
+
+    // If there are no errors, clear them
+    setErrors({});
+    // call the signup API here
   };
 
   return (
@@ -76,7 +77,10 @@ const Login = () => {
 
             <p className="text-sm text-center mt-4">
               Not registered yet?
-              <Link to="/signup" className="ms-1 font-medium text-primary underline">
+              <Link
+                to="/signup"
+                className="ms-1 font-medium text-primary underline"
+              >
                 Create an Account
               </Link>
             </p>
