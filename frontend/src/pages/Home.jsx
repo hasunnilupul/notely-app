@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
+import { MdAdd } from "react-icons/md";
 
 import Navbar from "../components/Navbar/Navbar";
 import NoteCard from "../components/Cards/NoteCard";
-import { MdAdd } from "react-icons/md";
+import AddEditNotes from "../components/Modals/AddEditNotes";
 
 const Home = () => {
+  const [openAddEditModal, setOpenAddEditModal] = useState({
+    show: false,
+    type: "add",
+    data: null,
+  }); // State to open Add/Edit modal
+
   return (
     <>
       <Navbar />
@@ -25,12 +32,28 @@ const Home = () => {
       </div>
 
       {/* Create new Note button */}
-      <div
+      <button
+        type="button"
         className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
-        onClick={() => {}}
+        onClick={() =>
+          setOpenAddEditModal({
+            show: true,
+            type: "add",
+            data: null,
+          })
+        }
       >
         <MdAdd className="text-[32px] text-white" />
-      </div>
+      </button>
+
+      <AddEditNotes
+        isOpen={openAddEditModal.show}
+        type={openAddEditModal.type}
+        data={openAddEditModal.data}
+        onClose={() =>
+          setOpenAddEditModal({ show: false, type: "add", data: null })
+        }
+      />
     </>
   );
 };
