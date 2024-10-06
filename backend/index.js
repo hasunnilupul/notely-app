@@ -250,7 +250,7 @@ app.patch("/api/notes/:id/pin", authenticateToken, async (req, res) => {
     const { isPinned } = req.body;
     const { user } = req.user;
 
-    if (!isPinned) {
+    if (isPinned === undefined || isPinned === null) {
         return res.status(400).json({ error: true, message: "No changes provided." });
     }
 
@@ -260,7 +260,7 @@ app.patch("/api/notes/:id/pin", authenticateToken, async (req, res) => {
             return res.status(404).json({ error: true, message: "Note not found." });
         }
 
-        if (isPinned && note.isPinned !== isPinned) note.isPinned = isPinned;
+        if (note.isPinned !== isPinned) note.isPinned = isPinned;
 
         await note.save();
 
