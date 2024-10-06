@@ -19,7 +19,7 @@ const TagInput = ({ tags, setTags }) => {
   // Function to handle key down events, specifically for the Enter key
   const handleOnKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleOnClick();
+      addnewTag();
     }
   };
 

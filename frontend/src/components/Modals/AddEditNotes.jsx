@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import TagInput from "../Input/TagInput";
 import { MdClose } from "react-icons/md";
+import axiosInstance from "../../utils/axiosInstance";
 
-const AddEditNotes = ({ isOpen, type, data, onClose }) => {
+const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
   const [formValues, setFormValues] = useState({
     title: "",
     content: "",
@@ -22,13 +23,44 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
   const editNote = () => {};
 
   // add a new note
-  const addNewNote = () => {};
+  const addNewNote = async () => {
+    try {
+      const response = await axiosInstance.post("/notes", {
+        title: formValues.title,
+        content: formValues.content,
+        tags,
+      });
+
+      if (response.data && response.data?.note) {
+        // Updates the state of notes with the updated note.
+        setNotes((prevState) => [...prevState, response.data.note]);
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error &&
+        error.response.data.message
+      ) {
+        setErrors((prevState) => ({
+          ...prevState,
+          server: error.response.data.message,
+        }));
+      } else {
+        setErrors((prevState) => ({
+          ...prevState,
+          server: "An unexpected error occurred.",
+        }));
+      }
+    }
+  };
 
   const handleOnClick = () => {
     if (!formValues.title) {
       setErrors((prevState) => ({
         ...prevState,
-        email: "Please enter the title",
+        title: "Please enter the title",
       }));
       return;
     }
@@ -36,7 +68,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
     if (!formValues.content) {
       setErrors((prevState) => ({
         ...prevState,
-        password: "Please enter the content",
+        content: "Please enter the content",
       }));
       return;
     }
@@ -61,7 +93,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
         title: data.title,
         content: data.content,
       }));
-      setTags(prevState => data.tags);
+      setTags((prevState) => data.tags);
     }
   }, []);
 
@@ -75,7 +107,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
         },
       }}
       contentLabel=""
-      className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-auto"
+      className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-scroll"
     >
       <div className="relative">
         <button
@@ -100,7 +132,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
             onChange={handleOnChange}
           />
           {errors?.title && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.title}</p>
+            <p className="text-red-500 text-xs -mt-2 mb-2">{errors.title}</p>
           )}
         </div>
 
@@ -118,7 +150,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
             onChange={handleOnChange}
           />
           {errors?.content && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.content}</p>
+            <p className="text-red-500 text-xs -mt-2 mb-2">{errors.content}</p>
           )}
         </div>
 
@@ -129,12 +161,16 @@ const AddEditNotes = ({ isOpen, type, data, onClose }) => {
           <TagInput tags={tags} setTags={setTags} />
         </div>
 
+        {errors?.server && (
+          <p className="text-red-500 text-xs mt-1 mb-2">{errors.server}</p>
+        )}
+
         <button
           type="button"
           className="btn-primary font-medium mt-5 p-3"
           onClick={handleOnClick}
         >
-          Add
+          {type === "edit" ? "Update Note" : "Add Note"}
         </button>
       </div>
     </Modal>
