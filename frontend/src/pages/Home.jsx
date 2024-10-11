@@ -6,6 +6,8 @@ import NoteCard from "../components/Cards/NoteCard";
 import AddEditNotes from "../components/Modals/AddEditNotes";
 import axiosInstance from "../utils/axiosInstance";
 import Toast from "../components/ToastMessage/Toast";
+import EmptyCard from "../components/EmptyCard/EmptyCard";
+import AddNotesImg from "../assets/images/add-notes.svg"; 
 
 const Home = () => {
   const [notes, setNotes] = useState([]); // state to hold all notes
@@ -147,23 +149,27 @@ const Home = () => {
     <>
       <Navbar />
       <div className="container mx-auto">
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          {notes.map(({ _id, ...noteRest }) => (
-            <NoteCard
-              key={_id}
-              {...noteRest}
-              onPinNote={() => hanldeNoteOnPin(_id, noteRest.isPinned)}
-              onEdit={() =>
-                setOpenAddEditModal({
-                  show: true,
-                  type: "edit",
-                  data: { _id, ...noteRest },
-                })
-              }
-              onDelete={() => handleNoteOnDelete(_id, noteRest.title)}
-            />
-          ))}
-        </div>
+        {notes.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {notes.map(({ _id, ...noteRest }) => (
+              <NoteCard
+                key={_id}
+                {...noteRest}
+                onPinNote={() => hanldeNoteOnPin(_id, noteRest.isPinned)}
+                onEdit={() =>
+                  setOpenAddEditModal({
+                    show: true,
+                    type: "edit",
+                    data: { _id, ...noteRest },
+                  })
+                }
+                onDelete={() => handleNoteOnDelete(_id, noteRest.title)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyCard imgSrc={AddNotesImg} message="Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!" />
+        )}
       </div>
 
       {/* Create new Note button */}
