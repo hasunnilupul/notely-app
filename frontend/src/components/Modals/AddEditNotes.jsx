@@ -4,7 +4,7 @@ import TagInput from "../Input/TagInput";
 import { MdClose } from "react-icons/md";
 import axiosInstance from "../../utils/axiosInstance";
 
-const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
+const AddEditNotes = ({ isOpen, type, data, onClose, setNotes, setAlert }) => {
   const [formValues, setFormValues] = useState({
     title: "",
     content: "",
@@ -31,6 +31,11 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
 
       if (response.data && response.data?.note) {
         // Updates the state of notes with the updated note.
+        setAlert({
+          show: true,
+          severity: "success",
+          message: "Note updated successfully",
+        });
         setNotes((prevState) =>
           prevState.map((item) =>
             item._id === noteId ? response.data.note : item
@@ -50,10 +55,11 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
           server: error.response.data.message,
         }));
       } else {
-        setErrors((prevState) => ({
-          ...prevState,
-          server: "An unexpected error occurred.",
-        }));
+        setAlert({
+          show: true,
+          severity: "error",
+          message: "An unexpected error occurred.",
+        });
       }
     }
   };
@@ -69,6 +75,11 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
 
       if (response.data && response.data?.note) {
         // added the new note to the note.
+        setAlert({
+          show: true,
+          severity: "success",
+          message: "Note created successfully",
+        });
         setNotes((prevState) => [...prevState, response.data.note]);
         onClose();
       }
@@ -84,10 +95,11 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
           server: error.response.data.message,
         }));
       } else {
-        setErrors((prevState) => ({
-          ...prevState,
-          server: "An unexpected error occurred.",
-        }));
+        setAlert({
+          show: true,
+          severity: "error",
+          message: "An unexpected error occurred.",
+        });
       }
     }
   };

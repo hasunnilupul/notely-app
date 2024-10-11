@@ -5,10 +5,15 @@ import Navbar from "../components/Navbar/Navbar";
 import NoteCard from "../components/Cards/NoteCard";
 import AddEditNotes from "../components/Modals/AddEditNotes";
 import axiosInstance from "../utils/axiosInstance";
+import Toast from "../components/ToastMessage/Toast";
 
 const Home = () => {
   const [notes, setNotes] = useState([]); // state to hold all notes
-  const [error, setError] = useState(""); // state to hold error message
+  const [alert, setAlert] = useState({
+    show: false,
+    severity: "info",
+    message: "",
+  }); // state to hold alert state
   const [openAddEditModal, setOpenAddEditModal] = useState({
     show: false,
     type: "add",
@@ -32,9 +37,17 @@ const Home = () => {
         error.response.data.error &&
         error.response.data.message
       ) {
-        setError((prevState) => error.response.data.message);
+        setAlert({
+          show: true,
+          severity: "error",
+          message: error.response.data.message,
+        });
       } else {
-        setError((prevState) => "An unexpected error occurred.");
+        setAlert({
+          show: true,
+          severity: "error",
+          message: "An unexpected error occurred.",
+        });
       }
     }
   };
@@ -48,6 +61,13 @@ const Home = () => {
 
       if (response.data && response.data?.note) {
         // Updates the state of notes with the updated note.
+        setAlert({
+          show: true,
+          severity: "success",
+          message: response.data.note.isPinned
+            ? "Note pinned successfully"
+            : "Note pin removed successfully",
+        });
         setNotes((prevState) =>
           prevState.map((note) =>
             note._id === noteId ? response.data.note : note
@@ -61,9 +81,17 @@ const Home = () => {
         error.response.data.error &&
         error.response.data.message
       ) {
-        setError((prevState) => error.response.data.message);
+        setAlert({
+          show: true,
+          severity: "error",
+          message: error.response.data.message,
+        });
       } else {
-        setError((prevState) => "An unexpected error occurred.");
+        setAlert({
+          show: true,
+          severity: "error",
+          message: "An unexpected error occurred.",
+        });
       }
     }
   };
@@ -78,6 +106,11 @@ const Home = () => {
 
           if (response.data && response.data.message) {
             // removes the deleted note from the state of notes.
+            setAlert({
+              show: true,
+              severity: "success",
+              message: "Note deleted successfully",
+            });
             setNotes((prevState) =>
               prevState.filter((note) => note._id !== noteId)
             );
@@ -89,9 +122,17 @@ const Home = () => {
             error.response.data.error &&
             error.response.data.message
           ) {
-            setError((prevState) => error.response.data.message);
+            setAlert({
+              show: true,
+              severity: "error",
+              message: error.response.data.message,
+            });
           } else {
-            setError((prevState) => "An unexpected error occurred.");
+            setAlert({
+              show: true,
+              severity: "error",
+              message: "An unexpected error occurred.",
+            });
           }
         }
       })();
@@ -105,7 +146,6 @@ const Home = () => {
   return (
     <>
       <Navbar />
-
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8">
           {notes.map(({ _id, ...noteRest }) => (
@@ -141,12 +181,22 @@ const Home = () => {
         <MdAdd className="text-[32px] text-white" />
       </button>
 
+      {/* Toast */}
+      <Toast
+        isShow={alert.show}
+        type={alert.severity}
+        message={alert.message}
+        onClose={() => setAlert({ show: false, severity: "info", message: "" })}
+      />
+
+      {/* Add or Edit Modal */}
       {openAddEditModal.show && (
         <AddEditNotes
           isOpen={openAddEditModal.show}
           type={openAddEditModal.type}
           data={openAddEditModal.data}
           setNotes={setNotes}
+          setAlert={setAlert}
           onClose={() =>
             setOpenAddEditModal({ show: false, type: "add", data: null })
           }
