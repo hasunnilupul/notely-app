@@ -186,9 +186,9 @@ app.post("/api/notes", authenticateToken, async (req, res) => {
     }
 });
 
-// PATCH endpoint for updating a specific note by its ID
+// PUT endpoint for updating a specific note by its ID
 // This route is protected by the authenticateToken middleware to ensure only authenticated users can update note details
-app.patch("/api/notes/:id", authenticateToken, async (req, res) => {
+app.put("/api/notes/:id", authenticateToken, async (req, res) => {
     const noteId = req.params.id;
     const { title, content, tags, isPinned } = req.body;
     const { user } = req.user;
