@@ -20,7 +20,43 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
   };
 
   // edit a note
-  const editNote = () => {};
+  const editNote = async () => {
+    const noteId = data._id;
+    try {
+      const response = await axiosInstance.put(`/notes/${noteId}`, {
+        title: formValues.title,
+        content: formValues.content,
+        tags,
+      });
+
+      if (response.data && response.data?.note) {
+        // Updates the state of notes with the updated note.
+        setNotes((prevState) =>
+          prevState.map((item) =>
+            item._id === noteId ? response.data.note : item
+          )
+        );
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error &&
+        error.response.data.message
+      ) {
+        setErrors((prevState) => ({
+          ...prevState,
+          server: error.response.data.message,
+        }));
+      } else {
+        setErrors((prevState) => ({
+          ...prevState,
+          server: "An unexpected error occurred.",
+        }));
+      }
+    }
+  };
 
   // add a new note
   const addNewNote = async () => {
@@ -32,7 +68,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
       });
 
       if (response.data && response.data?.note) {
-        // Updates the state of notes with the updated note.
+        // added the new note to the note.
         setNotes((prevState) => [...prevState, response.data.note]);
         onClose();
       }
@@ -56,6 +92,7 @@ const AddEditNotes = ({ isOpen, type, data, onClose, setNotes }) => {
     }
   };
 
+  // submit button click event handler
   const handleOnClick = () => {
     if (!formValues.title) {
       setErrors((prevState) => ({
